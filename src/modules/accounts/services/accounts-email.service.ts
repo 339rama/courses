@@ -5,6 +5,11 @@ import { AccountConfirmCode } from '../models/AccountConfirmCode.entity';
 import { Repository } from 'typeorm';
 import { Account } from '../models/Account/Account.entity';
 import { WrongCodeException } from '../exceptions/WrongCode.exception';
+import { MailService } from 'src/modules/mail/services/mail.service';
+import { ConfigService } from '@nestjs/config';
+import { EmailConfirmException } from '../exceptions/EmailConfirm.exception';
+import { EmailConfirmDto } from '../dto/EmailConfirmDto';
+import { EmailTakenException } from '../exceptions/EmailTaken.exception';
 
 @Injectable()
 export class AccountsEmailService {
@@ -12,10 +17,22 @@ export class AccountsEmailService {
     @InjectRepository(AccountConfirmCode)
     private readonly accountsConfirmCodesRepository: Repository<AccountConfirmCode>,
     private readonly accountsService: AccountsService,
+    private readonly mailService: MailService,
+    private readonly config: ConfigService,
   ) {}
 
-  private async sendEmailCode(email: string): Promise<void> {
-    // TODO send email
+  private async sendEmailTo(
+    type: 'CONFIRM' | 'CHANGE',
+    account: Account,
+    code: string,
+  ): Promise<void> {
+    const host = this.config.get('HOST');
+    const link =
+      type === 'CONFIRM'
+        ? `${host}/confirm/original?accountId=${account.id}&code=${code}`
+        : `${host}/confirm/changed?accountId=${account.id}&code=${code}`;
+    const confirmMessage = `Перейдите по ссылке для подтверждения email - ${link}`;
+    await this.mailService.send(confirmMessage, account.email, 'Потверждение почты');
   }
 
   private getRandomCode(): string {
@@ -28,33 +45,40 @@ export class AccountsEmailService {
   public async confirmEmailSendCode(email: string): Promise<boolean> {
     const account = await this.accountsService.getRepo().findOneOrFail({ email });
     const code = this.getRandomCode();
-    console.log(code);
     await this.accountsConfirmCodesRepository.save({ code, account });
-    await this.sendEmailCode(code);
+    await this.sendEmailTo('CONFIRM', account, code);
     return true;
   }
 
-  public async confirmEmailDo(code: string): Promise<boolean> {
+  public async confirmEmailDo(payload: EmailConfirmDto): Promise<boolean> {
+    const { accountId, code } = payload;
     const confirm = await this.getAccountConfirmOrFail(code);
     const account = confirm.account;
+    if (!(account.id !== accountId) || confirm.code !== code) {
+      throw new EmailConfirmException();
+    }
     await this.accountsService.getRepo().save({ ...account, is_email_confirmed: true });
     return true;
   }
 
   public async changeEmailSendCode(account: Account, email: string): Promise<boolean> {
     const code = this.getRandomCode();
-    console.log(code);
+    const dublicate = await this.accountsService.findOne({ email });
+    if (dublicate) {
+      throw new EmailTakenException();
+    }
     await this.accountsConfirmCodesRepository.save({ code, account });
-    await this.sendEmailCode(code);
+    await this.sendEmailTo('CHANGE', account, code);
     return true;
   }
 
-  public async changeEmailDo(account: Account, code: string): Promise<boolean> {
+  public async changeEmailDo(payload: EmailConfirmDto): Promise<boolean> {
+    const { code, accountId } = payload;
     const confirm = await this.getAccountConfirmOrFail(code);
-    if (confirm.account.id !== account.id) {
+    if (confirm.account.id !== accountId) {
       throw new WrongCodeException();
     }
-    await this.accountsService.getRepo().save({ ...account, is_email_confirmed: true });
+    await this.accountsService.getRepo().save({ ...confirm.account, is_email_confirmed: true });
     return true;
   }
 

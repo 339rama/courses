@@ -22,6 +22,11 @@ export class AccountsService extends TypeOrmCrudService<Account> {
   }
 
   // TODO calculate "is_leader" field
+  public async getManyExtended(req: CrudRequest): Promise<AccountExtendedDto[]> {
+    const accounts = (await this.getMany(req)) as Account[];
+    return accounts.map(account => ({ ...account, is_leader: true, is_subscription_actual: true }));
+  }
+
   public async getOneExtended(req: CrudRequest): Promise<AccountExtendedDto> {
     const account = await this.getOne(req);
     const last_subscription = await this.accountsSubscriptionsService.getAccountLastSubscription(

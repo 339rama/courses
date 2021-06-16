@@ -19,6 +19,15 @@ import { LessonHomework } from './models/LessonHomework.entity';
 import { LessonIsDone } from './models/LessonIsDone.entity';
 import { LessonViewed } from './models/LessonViewed.entity';
 import { TestVariant } from './models/TestVariant.entity';
+import { LessonsService } from './services/lessons.service';
+import { CoursesService } from './services/courses.service';
+import { CourseLevelsService } from './services/course-levels.service';
+import { HomeworksService } from './services/homeworks.service';
+import { CourseLevelsController } from './controllers/course-levels.controller';
+import { CoursesController } from './controllers/courses.controller';
+import { AccountsService } from '../accounts/services/accounts.service';
+import { HomeworksController } from './controllers/homeworks.controller';
+import { LessonsController } from './controllers/lessons.controller';
 
 @Module({
   imports: [
@@ -44,7 +53,14 @@ import { TestVariant } from './models/TestVariant.entity';
       LessonCommentAnswerReview,
     ]),
   ],
-  controllers: [],
-  providers: [],
+  controllers: [CourseLevelsController, CoursesController, HomeworksController, LessonsController],
+  providers: [
+    CoursesService,
+    LessonsService,
+    CourseLevelsService,
+    HomeworksService,
+    AccountsService,
+  ],
+  exports: [CoursesService, CourseLevelsService, HomeworksService, LessonsService],
 })
 export class CoursesModule {}

@@ -9,6 +9,7 @@ import JwtAuthenticationGuard from '../../auth/guards/jwt.guard';
 import { AccountLoginDto } from '../dto/AccountLoginDto';
 import { AccountRegisterDto } from '../dto/AccountRegisterDto';
 import { ChangePasswordDto } from '../dto/ChangePasswordDto';
+import { EmailConfirmDto } from '../dto/EmailConfirmDto';
 import { Account } from '../models/Account/Account.entity';
 import { AccountsAuthService } from '../services/accounts-auth.service';
 import { AccountsEmailService } from '../services/accounts-email.service';
@@ -51,8 +52,8 @@ export class AccountsController implements CrudController<Account> {
   }
 
   @Post('confirmEmail/do')
-  async confirmEmailDo(@Body() data: { email: string; code: string }): Promise<boolean> {
-    return await this.accountsEmailService.confirmEmailDo(data.email);
+  async confirmEmailDo(@Body() data: EmailConfirmDto): Promise<boolean> {
+    return await this.accountsEmailService.confirmEmailDo(data);
   }
 
   @Post('changeEmail/sendCode')
@@ -66,9 +67,9 @@ export class AccountsController implements CrudController<Account> {
   @Post('changeEmail/do')
   async changeEmailDo(
     @AccountDecorator() account: Account,
-    @Body() data: { email: string; code: string },
+    @Body() data: EmailConfirmDto,
   ): Promise<boolean> {
-    return await this.accountsEmailService.changeEmailDo(account, data.email);
+    return await this.accountsEmailService.changeEmailDo(data);
   }
 
   @Post('changePassword')
@@ -79,9 +80,16 @@ export class AccountsController implements CrudController<Account> {
     return await this.accountsPasswordService.changePassword(account, data);
   }
 
-  @Post('restorePassword')
+  @Post('restorePassword/sendCode')
   async restorePasswordSendCode(@Body() data: { email: any }): Promise<boolean> {
-    return await this.accountsPasswordService.restorePassword(data.email);
+    return await this.accountsPasswordService.restorePasswordSendCode(data.email);
+  }
+
+  @Post('restorePassword/do')
+  async restorePasswordDo(
+    @Body() data: { accountId: number; code: string; newPassword: any },
+  ): Promise<boolean> {
+    return await this.accountsPasswordService.restorePasswordDo(data);
   }
 
   @ApiBody({ type: AccountLoginDto })

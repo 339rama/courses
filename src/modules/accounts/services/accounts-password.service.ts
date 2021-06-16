@@ -9,6 +9,8 @@ import { ConfigService } from '@nestjs/config';
 import { ChangePasswordDto } from '../dto/ChangePasswordDto';
 import { Account } from '../models/Account/Account.entity';
 import { WrongPasswordException } from '../exceptions/WrongPassword.exception';
+import { MailService } from 'src/modules/mail/services/mail.service';
+import { WrongCodeException } from '../exceptions/WrongCode.exception';
 
 @Injectable()
 export class AccountsPasswordService {
@@ -17,10 +19,18 @@ export class AccountsPasswordService {
     private readonly accountsConfirmCodesRepository: Repository<AccountConfirmCode>,
     private readonly accountsService: AccountsService,
     private readonly config: ConfigService,
+    private readonly mailService: MailService,
   ) {}
 
-  private async sendPassword(password: string): Promise<void> {
-    // todo send email with password
+  private async sendPasswordRecoverEmail(
+    email: string,
+    accountId: number,
+    code: string,
+  ): Promise<void> {
+    const host = this.config.get('HOST');
+    const link = `${host}/auth/recover?accountId=${accountId}&code=${code}`;
+    const message = `Для смены пароля перейдите по ссылке - ${link}`;
+    await this.mailService.send(message, email, 'Восстановление пароля');
   }
 
   public getHashPassword(password: string): string {
@@ -37,19 +47,45 @@ export class AccountsPasswordService {
     await this.accountsService.getRepo().save({ ...account, hash_password });
   }
 
-  public async restorePassword(email: string): Promise<boolean> {
-    const account = this.accountsService.findOne({ email });
+  public async restorePasswordSendCode(email: string): Promise<boolean> {
+    const account = await this.accountsService.findOne({ email });
     if (!account) {
       throw new WrongEmailException();
     }
-    const newPass = this.getRandomPass();
-    await this.sendPassword(newPass);
-    const hash = this.getHashPassword(newPass);
+    const code = this.getRandomCode();
+    await this.sendPasswordRecoverEmail(email, account.id, code);
+    await this.accountsConfirmCodesRepository.save({ code, account });
+    return true;
+  }
+
+  public async restorePasswordDo(payload: {
+    accountId: number;
+    code: string;
+    newPassword: any;
+  }): Promise<boolean> {
+    const { accountId, code, newPassword } = payload;
+    const account = await this.accountsService.findOne({ id: accountId });
+    if (!account) {
+      throw new WrongEmailException();
+    }
+    const confirm = await this.getAccountConfirmOrFail(code);
+    if (confirm.account.id !== accountId) {
+      throw new WrongCodeException();
+    }
+    const hash = this.getHashPassword(newPassword);
     await this.accountsService.getRepo().save({ ...account, hash_password: hash });
     return true;
   }
 
-  private getRandomPass(): string {
+  public async getAccountConfirmOrFail(code: string): Promise<AccountConfirmCode> {
+    return await this.accountsConfirmCodesRepository
+      .createQueryBuilder('confirm')
+      .leftJoinAndSelect('confirm.account', 'account')
+      .where('confirm.code = :code', { code })
+      .getOneOrFail();
+  }
+
+  private getRandomCode(): string {
     return Math.random()
       .toString(36)
       .replace(/[^a-z]+/g, '')
