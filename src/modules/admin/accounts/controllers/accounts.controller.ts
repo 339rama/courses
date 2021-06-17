@@ -1,5 +1,6 @@
-import { Controller, Get, UseGuards } from '@nestjs/common';
+import { Controller, Get, UseGuards, UseInterceptors } from '@nestjs/common';
 import { Crud, CrudController, CrudRequest, Override, ParsedRequest } from '@nestjsx/crud';
+import { listResponseInterceptor } from 'src/core/interceptors/ListResponse.interceptor';
 import { AccountExtendedDto } from 'src/modules/accounts/dto/AccountExtended';
 import { Account } from 'src/modules/accounts/models/Account/Account.entity';
 import { AccountsService } from 'src/modules/accounts/services/accounts.service';
@@ -12,10 +13,11 @@ import JwtAuthenticationGuard from 'src/modules/auth/guards/jwt.guard';
   query: {
     exclude: ['hash_password'],
     join: {
-      subscriptions: { eager: true },
       courses: { eager: true },
     },
+    alwaysPaginate: true,
   },
+  routes: { getManyBase: { decorators: [UseInterceptors(listResponseInterceptor('accounts'))] } },
 })
 @Controller('admin/accounts')
 @UseGuards(JwtAuthenticationGuard)

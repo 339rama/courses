@@ -5,5 +5,5 @@ export class Token {
   access_token: string;
 
   @ApiProperty()
-  token_type: 'bearer';
+  token_type: 'Bearer';
 }

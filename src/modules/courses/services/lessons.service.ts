@@ -21,6 +21,10 @@ export class LessonsService extends TypeOrmCrudService<Lesson> {
     return this.repository;
   }
 
+  public getLessonsByCourseId(courseId: number): Promise<Lesson[]> {
+    return this.find({ where: { course: { id: courseId } } });
+  }
+
   public async addTimeCode(
     timeCode: number,
     account: Account,

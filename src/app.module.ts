@@ -6,7 +6,7 @@ import { AuthModule } from './modules/auth/auth.module';
 import { CoursesModule } from './modules/courses/courses.module';
 import { DatabaseModule } from './modules/database/database.module';
 import { MailModule } from './modules/mail/mail.module';
-import { PaymentModule } from './modules/payment/paymens.module';
+import { MailsModule } from './modules/mails/mails.module';
 
 @Module({
   imports: [
@@ -19,8 +19,8 @@ import { PaymentModule } from './modules/payment/paymens.module';
     AuthModule,
     AdminModule,
     CoursesModule,
-    PaymentModule,
     MailModule,
+    MailsModule,
   ],
   controllers: [],
   providers: [],

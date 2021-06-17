@@ -1,4 +1,6 @@
 import { Injectable } from '@nestjs/common';
+import { PaginationDto } from 'src/core/dto/PaginationDto';
+import { queryPaginationBuilder } from 'src/modules/database/builders/paginationBuilder';
 import { Account } from '../models/Account/Account.entity';
 import { AccountsService } from './accounts.service';
 
@@ -6,8 +8,13 @@ import { AccountsService } from './accounts.service';
 export class AccountsLeadersService {
   constructor(private readonly accountsService: AccountsService) {}
 
-  public async getLeaders(): Promise<Account[]> {
-    // TODO return only accounts with cources
-    return this.accountsService.find();
+  public async getLeaders(pagination?: PaginationDto): Promise<Account[]> {
+    return queryPaginationBuilder(
+      this.accountsService
+        .getRepo()
+        .createQueryBuilder('account')
+        .innerJoinAndSelect('account.courses', 'courses'),
+      pagination,
+    ).getMany();
   }
 }

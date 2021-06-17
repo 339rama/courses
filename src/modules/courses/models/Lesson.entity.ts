@@ -1,19 +1,10 @@
 import { IsPositive, MaxLength, MinLength } from 'class-validator';
 import { AccountLessonTimeCode } from 'src/modules/accounts/models/AccountLessonTimeCode.entity';
 import { BaseEntity } from 'src/modules/database/models/BaseEntity';
-import {
-  Entity,
-  UpdateDateColumn,
-  Column,
-  PrimaryGeneratedColumn,
-  ManyToOne,
-  OneToMany,
-} from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, OneToMany } from 'typeorm';
 import { Course } from './Course.entity';
-import { LessonFile } from './LessonFile.entity';
 import { LessonHomework } from './LessonHomework.entity';
 import { LessonIsDone } from './LessonIsDone.entity';
-import { LessonViewed } from './LessonViewed.entity';
 
 @Entity('lesson')
 export class Lesson extends BaseEntity {
@@ -53,15 +44,6 @@ export class Lesson extends BaseEntity {
   course: Course;
 
   @OneToMany(
-    () => LessonFile,
-    file => file.lesson,
-    {
-      cascade: true,
-    },
-  )
-  files?: LessonFile[];
-
-  @OneToMany(
     () => LessonHomework,
     homework => homework.lesson,
     {
@@ -81,10 +63,4 @@ export class Lesson extends BaseEntity {
     time_code => time_code.lesson,
   )
   time_codes!: AccountLessonTimeCode[];
-
-  @OneToMany(
-    () => LessonViewed,
-    view => view.lesson,
-  )
-  lesson_views!: LessonViewed[];
 }

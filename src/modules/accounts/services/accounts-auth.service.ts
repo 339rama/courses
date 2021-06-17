@@ -15,8 +15,9 @@ export class AccountsAuthService {
   ) {}
 
   public async register(data: AccountRegisterDto): Promise<Token> {
-    const account_data = {} as Account;
-    account_data.hash_password = this.accountsPasswordService.getHashPassword(data.password);
+    const { password, ...otherFields } = data;
+    const account_data = { ...otherFields } as Partial<Account>;
+    account_data.hash_password = this.accountsPasswordService.getHashPassword(password);
     const account = await this.accountsService.getRepo().save(account_data);
     return this.authService.getTokenResponse(this.authService.getToken(account.id));
   }

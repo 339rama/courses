@@ -1,6 +1,6 @@
 import { MaxLength, MinLength } from 'class-validator';
 import { BaseEntity } from 'src/modules/database/models/BaseEntity';
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, OneToMany } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
 import { HomeworkQuestion } from './HomeworkQuestion.entity';
 
 @Entity('test_variant')

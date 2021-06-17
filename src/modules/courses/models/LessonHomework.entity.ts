@@ -1,5 +1,13 @@
 import { BaseEntity } from 'src/modules/database/models/BaseEntity';
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, OneToMany } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  ManyToOne,
+  OneToMany,
+  OneToOne,
+  JoinColumn,
+} from 'typeorm';
 import { HomeworkType } from '../enums/HomeworkType';
 import { HomeworkAnswerFree } from './HomeworkAnswerFree.entity';
 import { HomeworkIsDone } from './HomeworkIsDone.entity';
@@ -35,14 +43,9 @@ export class LessonHomework extends BaseEntity {
   )
   results?: HomeworkResult[];
 
-  @OneToMany(
-    () => HomeworkQuestion,
-    question => question.lesson_homework,
-    {
-      cascade: true,
-    },
-  )
-  questions?: HomeworkQuestion[];
+  @OneToOne(() => HomeworkQuestion, { eager: true })
+  @JoinColumn()
+  question: HomeworkQuestion;
 
   @OneToMany(
     () => HomeworkIsDone,

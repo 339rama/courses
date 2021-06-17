@@ -12,10 +12,10 @@ export class AuthService {
   }
 
   public getTokenResponse(token: string): Token {
-    return { access_token: token, token_type: 'bearer' };
+    return { access_token: token, token_type: 'Bearer' };
   }
 
   public async verifyPassword(incoming: string, password: string) {
-    return await bcrypt.compare(incoming, password);
+    return await bcrypt.compare(`${incoming}`, password);
   }
 }

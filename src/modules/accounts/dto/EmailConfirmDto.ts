@@ -2,7 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 
 export class EmailConfirmDto {
   @ApiProperty()
-  accountId: number;
+  account_id: number;
   @ApiProperty()
   code: string;
 }

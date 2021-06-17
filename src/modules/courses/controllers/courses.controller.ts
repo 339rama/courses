@@ -5,7 +5,6 @@ import { AccountDecorator } from 'src/modules/admin/auth/decorators/user.decorat
 import JwtAuthenticationGuard from 'src/modules/auth/guards/jwt.guard';
 import { Course } from 'src/modules/courses/models/Course.entity';
 import { CoursesService } from 'src/modules/courses/services/courses.service';
-import { CourseReview } from '../models/CourseReview.entity';
 import { CoursesReviewsService } from '../services/courses-reviews.service';
 
 @Crud({
@@ -14,7 +13,7 @@ import { CoursesReviewsService } from '../services/courses-reviews.service';
   },
   query: {
     join: {
-      account: { eager: true },
+      author: { eager: true },
     },
     filter: [
       {

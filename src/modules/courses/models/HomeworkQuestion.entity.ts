@@ -1,6 +1,6 @@
 import { MaxLength, MinLength } from 'class-validator';
 import { BaseEntity } from 'src/modules/database/models/BaseEntity';
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, OneToOne } from 'typeorm';
 import { LessonHomework } from './LessonHomework.entity';
 import { TestVariant } from './TestVariant.entity';
 
@@ -15,12 +15,11 @@ export class HomeworkQuestion extends BaseEntity {
   question: string;
 
   //relations
-  @ManyToOne(
+  @OneToOne(
     () => LessonHomework,
-    homework => homework.questions,
-    { onDelete: 'CASCADE' },
+    hm => hm.question,
   )
-  lesson_homework: LessonHomework;
+  homework: LessonHomework;
 
   @ManyToOne(
     () => TestVariant,

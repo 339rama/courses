@@ -11,6 +11,7 @@ import { Account } from '../models/Account/Account.entity';
 import { WrongPasswordException } from '../exceptions/WrongPassword.exception';
 import { MailService } from 'src/modules/mail/services/mail.service';
 import { WrongCodeException } from '../exceptions/WrongCode.exception';
+import { RestorePasswordDto } from '../dto/RestorePasswordDto';
 
 @Injectable()
 export class AccountsPasswordService {
@@ -53,26 +54,22 @@ export class AccountsPasswordService {
       throw new WrongEmailException();
     }
     const code = this.getRandomCode();
-    await this.sendPasswordRecoverEmail(email, account.id, code);
     await this.accountsConfirmCodesRepository.save({ code, account });
+    await this.sendPasswordRecoverEmail(email, account.id, code);
     return true;
   }
 
-  public async restorePasswordDo(payload: {
-    accountId: number;
-    code: string;
-    newPassword: any;
-  }): Promise<boolean> {
-    const { accountId, code, newPassword } = payload;
-    const account = await this.accountsService.findOne({ id: accountId });
+  public async restorePasswordDo(payload: RestorePasswordDto): Promise<boolean> {
+    const { account_id, code, new_password } = payload;
+    const account = await this.accountsService.findOne({ id: account_id });
     if (!account) {
       throw new WrongEmailException();
     }
     const confirm = await this.getAccountConfirmOrFail(code);
-    if (confirm.account.id !== accountId) {
+    if (confirm.account.id !== account_id) {
       throw new WrongCodeException();
     }
-    const hash = this.getHashPassword(newPassword);
+    const hash = this.getHashPassword(new_password);
     await this.accountsService.getRepo().save({ ...account, hash_password: hash });
     return true;
   }

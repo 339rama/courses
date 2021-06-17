@@ -1,14 +1,11 @@
 import { Course } from 'src/modules/courses/models/Course.entity';
-import { CoursePurchase } from 'src/modules/courses/models/CoursePurchase.entity';
 import { CourseReview } from 'src/modules/courses/models/CourseReview.entity';
 import { FavouriteCourse } from 'src/modules/courses/models/FavouriteCourse.entity';
 import { HomeworkAnswerFree } from 'src/modules/courses/models/HomeworkAnswerFree.entity';
 import { HomeworkIsDone } from 'src/modules/courses/models/HomeworkIsDone.entity';
 import { HomeworkResult } from 'src/modules/courses/models/HomeworkResult.entity';
 import { LessonIsDone } from 'src/modules/courses/models/LessonIsDone.entity';
-import { LessonViewed } from 'src/modules/courses/models/LessonViewed.entity';
 import { BaseEntity } from 'src/modules/database/models/BaseEntity';
-import { Purchase } from 'src/modules/payment/models/Purchase.entity';
 import { JoinTable, ManyToMany, OneToMany } from 'typeorm';
 import { AccountConfirmCode } from '../AccountConfirmCode.entity';
 import { AccountLessonTimeCode } from '../AccountLessonTimeCode.entity';
@@ -25,7 +22,7 @@ export class AccountRelations extends BaseEntity {
 
   @OneToMany(
     () => Course,
-    course => course.account,
+    course => course.author,
     {
       cascade: true,
     },
@@ -76,24 +73,6 @@ export class AccountRelations extends BaseEntity {
     review => review.account,
   )
   reviews!: CourseReview[];
-
-  @OneToMany(
-    () => LessonViewed,
-    view => view.account,
-  )
-  lesson_views!: LessonViewed[];
-
-  @OneToMany(
-    () => CoursePurchase,
-    purchase => purchase.account,
-  )
-  courses_purchases!: CoursePurchase[];
-
-  @OneToMany(
-    () => Purchase,
-    purchase => purchase.account,
-  )
-  purchases!: Purchase[];
 
   @ManyToMany(
     () => Course,

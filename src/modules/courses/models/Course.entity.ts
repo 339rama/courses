@@ -1,10 +1,8 @@
 import { MaxLength, MinLength } from 'class-validator';
 import { Account } from 'src/modules/accounts/models/Account/Account.entity';
 import { BaseEntity } from 'src/modules/database/models/BaseEntity';
-import { Purchase } from 'src/modules/payment/models/Purchase.entity';
 import { Entity, Column, PrimaryGeneratedColumn, OneToMany, ManyToOne, ManyToMany } from 'typeorm';
 import { CourseLevel } from './CourseLevel.entity';
-import { CoursePurchase } from './CoursePurchase.entity';
 import { CourseReview } from './CourseReview.entity';
 import { FavouriteCourse } from './FavouriteCourse.entity';
 import { Lesson } from './Lesson.entity';
@@ -36,14 +34,12 @@ export class Course extends BaseEntity {
   is_published: boolean;
 
   //relations
-  @OneToMany(
+  @ManyToOne(
     () => CourseLevel,
     level => level.course,
-    {
-      cascade: true,
-    },
+    { onDelete: 'SET NULL', eager: true },
   )
-  levels?: CourseLevel[];
+  level: CourseLevel;
 
   @OneToMany(
     () => Lesson,
@@ -56,10 +52,10 @@ export class Course extends BaseEntity {
 
   @ManyToOne(
     () => Account,
-    account => account.courses,
+    author => author.courses,
     { onDelete: 'CASCADE' },
   )
-  account: Account;
+  author: Account;
 
   @OneToMany(
     () => FavouriteCourse,
@@ -72,18 +68,6 @@ export class Course extends BaseEntity {
     review => review.course,
   )
   reviews!: CourseReview[];
-
-  @OneToMany(
-    () => CoursePurchase,
-    purchase => purchase.course,
-  )
-  courses_purchases!: CoursePurchase[];
-
-  @OneToMany(
-    () => Purchase,
-    purchase => purchase.course,
-  )
-  purchases!: Purchase[];
 
   @ManyToMany(
     () => Account,

@@ -10,7 +10,7 @@ export class AccountRegisterDto {
   @ApiProperty()
   @MinLength(1)
   @MaxLength(100)
-  lastName: string;
+  last_name: string;
 
   @ApiProperty()
   @MinLength(4)
@@ -23,11 +23,11 @@ export class AccountRegisterDto {
   @ApiProperty()
   @MinLength(7)
   @MaxLength(14)
-  phoneNumber: string;
+  phone_number: string;
 
   @ApiProperty()
   @MaxLength(500)
-  photoLink?: string;
+  photo_link?: string;
 
   @ApiProperty()
   @MinLength(3)
@@ -48,7 +48,4 @@ export class AccountRegisterDto {
 
   @ApiProperty()
   site_link?: string;
-
-  @ApiProperty()
-  device_registration_id?: string;
 }

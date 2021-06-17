@@ -25,7 +25,7 @@ export class Account extends AccountRelations {
   photo_link?: string;
 
   @Column('varchar', { nullable: false, unique: true })
-  photo_number: string;
+  phone_number: string;
 
   @Column('boolean', { default: false, nullable: false })
   is_admin: boolean;
@@ -48,6 +48,6 @@ export class Account extends AccountRelations {
   @Column('varchar')
   site_link?: string;
 
-  @Column('boolean', { default: false, nullable: false })
-  is_test_period_subscription_available: boolean;
+  @Column('integer', { default: 0 })
+  wallet: number;
 }

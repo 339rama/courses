@@ -1,5 +1,6 @@
-import { Controller, UseGuards } from '@nestjs/common';
+import { Controller, UseGuards, UseInterceptors } from '@nestjs/common';
 import { Crud, CrudController } from '@nestjsx/crud';
+import { listResponseInterceptor } from 'src/core/interceptors/ListResponse.interceptor';
 import JwtAuthenticationGuard from 'src/modules/auth/guards/jwt.guard';
 import { Course } from 'src/modules/courses/models/Course.entity';
 import { CoursesService } from 'src/modules/courses/services/courses.service';
@@ -10,9 +11,12 @@ import { CoursesService } from 'src/modules/courses/services/courses.service';
   },
   query: {
     join: {
-      account: { eager: true },
+      author: { eager: true },
+      level: { eager: true },
     },
+    alwaysPaginate: true,
   },
+  routes: { getManyBase: { decorators: [UseInterceptors(listResponseInterceptor('courses'))] } },
 })
 @Controller('admin/courses')
 @UseGuards(JwtAuthenticationGuard)

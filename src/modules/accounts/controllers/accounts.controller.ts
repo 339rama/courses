@@ -1,6 +1,11 @@
-import { Body, Controller, Get, HttpCode, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, Patch, Post, UseGuards } from '@nestjs/common';
 import { ApiBody, ApiResponse } from '@nestjs/swagger';
 import { Crud, CrudController } from '@nestjsx/crud';
+import { PaginationParams } from 'src/core/decorators/PaginationParams.decorator';
+import { TransformedBody } from 'src/core/decorators/TransformBody.decorator';
+import { BooleanResponse } from 'src/core/dto/BooleanResponse';
+import { PaginationDto } from 'src/core/dto/PaginationDto';
+import { booleanResponse } from 'src/core/helpers/booleanResponse';
 import { AccountDecorator } from 'src/modules/admin/auth/decorators/user.decorator';
 import { Token } from 'src/modules/auth/dto/Token';
 import { LocalAuthGuard } from 'src/modules/auth/guards/localAuth.guard';
@@ -10,6 +15,7 @@ import { AccountLoginDto } from '../dto/AccountLoginDto';
 import { AccountRegisterDto } from '../dto/AccountRegisterDto';
 import { ChangePasswordDto } from '../dto/ChangePasswordDto';
 import { EmailConfirmDto } from '../dto/EmailConfirmDto';
+import { RestorePasswordDto } from '../dto/RestorePasswordDto';
 import { Account } from '../models/Account/Account.entity';
 import { AccountsAuthService } from '../services/accounts-auth.service';
 import { AccountsEmailService } from '../services/accounts-email.service';
@@ -41,7 +47,7 @@ export class AccountsController implements CrudController<Account> {
   }
 
   @Post('register')
-  async register(data: AccountRegisterDto): Promise<Token> {
+  async register(@TransformedBody() data: AccountRegisterDto): Promise<Token> {
     return await this.accountAuthService.register(data);
   }
 
@@ -51,44 +57,49 @@ export class AccountsController implements CrudController<Account> {
   }
 
   @Post('confirmEmail/do')
-  async confirmEmailDo(@Body() data: EmailConfirmDto): Promise<boolean> {
+  async confirmEmailDo(@TransformedBody() data: EmailConfirmDto): Promise<boolean> {
     return await this.accountsEmailService.confirmEmailDo(data);
   }
 
   @Post('changeEmail/sendCode')
+  @UseGuards(JwtAuthenticationGuard)
   async changeEmailSendCode(
     @AccountDecorator() account: Account,
     @Body() data: { email: string },
-  ): Promise<boolean> {
-    return await this.accountsEmailService.changeEmailSendCode(account, data.email);
+  ): Promise<BooleanResponse> {
+    await this.accountsEmailService.changeEmailSendCode(account, data.email);
+    return booleanResponse();
   }
 
   @Post('changeEmail/do')
+  @UseGuards(JwtAuthenticationGuard)
   async changeEmailDo(
     @AccountDecorator() account: Account,
-    @Body() data: EmailConfirmDto,
-  ): Promise<boolean> {
-    return await this.accountsEmailService.changeEmailDo(data);
+    @TransformedBody() data: EmailConfirmDto,
+  ): Promise<BooleanResponse> {
+    await this.accountsEmailService.changeEmailDo(data);
+    return booleanResponse();
   }
 
   @Post('changePassword')
+  @UseGuards(JwtAuthenticationGuard)
   async changePassword(
     @AccountDecorator() account: Account,
-    @Body() data: ChangePasswordDto,
+    @TransformedBody() data: ChangePasswordDto,
   ): Promise<void> {
     return await this.accountsPasswordService.changePassword(account, data);
   }
 
   @Post('restorePassword/sendCode')
-  async restorePasswordSendCode(@Body() data: { email: any }): Promise<boolean> {
-    return await this.accountsPasswordService.restorePasswordSendCode(data.email);
+  async restorePasswordSendCode(@Body() data: { email: any }): Promise<BooleanResponse> {
+    await this.accountsPasswordService.restorePasswordSendCode(data.email);
+    return booleanResponse();
   }
 
   @Post('restorePassword/do')
-  async restorePasswordDo(
-    @Body() data: { accountId: number; code: string; newPassword: any },
-  ): Promise<boolean> {
-    return await this.accountsPasswordService.restorePasswordDo(data);
+  async restorePasswordDo(@TransformedBody() data: RestorePasswordDto): Promise<BooleanResponse> {
+    await this.accountsPasswordService.restorePasswordDo(data);
+    return booleanResponse();
   }
 
   @ApiBody({ type: AccountLoginDto })
@@ -111,8 +122,16 @@ export class AccountsController implements CrudController<Account> {
   }
 
   @Get('leaders')
+  async leaders(@PaginationParams() params: PaginationDto): Promise<Account[]> {
+    return await this.accounsLeadersService.getLeaders(params);
+  }
+
+  @Patch('')
   @UseGuards(JwtAuthenticationGuard)
-  async leaders(): Promise<Account[]> {
-    return await this.accounsLeadersService.getLeaders();
+  public async updateMe(
+    @AccountDecorator() account: Account,
+    @TransformedBody() data: Partial<Account>,
+  ): Promise<Account> {
+    return this.service.updateMe({ ...account, ...data });
   }
 }

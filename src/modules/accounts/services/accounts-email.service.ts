@@ -51,10 +51,10 @@ export class AccountsEmailService {
   }
 
   public async confirmEmailDo(payload: EmailConfirmDto): Promise<boolean> {
-    const { accountId, code } = payload;
+    const { account_id, code } = payload;
     const confirm = await this.getAccountConfirmOrFail(code);
     const account = confirm.account;
-    if (!(account.id !== accountId) || confirm.code !== code) {
+    if (!(account.id === account_id) || !(confirm.code === code)) {
       throw new EmailConfirmException();
     }
     await this.accountsService.getRepo().save({ ...account, is_email_confirmed: true });
@@ -69,13 +69,15 @@ export class AccountsEmailService {
     }
     await this.accountsConfirmCodesRepository.save({ code, account });
     await this.sendEmailTo('CHANGE', account, code);
+    const accountUpdates = { ...account, is_email_confirmed: false, email };
+    await this.accountsService.getRepo().save(accountUpdates);
     return true;
   }
 
   public async changeEmailDo(payload: EmailConfirmDto): Promise<boolean> {
-    const { code, accountId } = payload;
+    const { code, account_id } = payload;
     const confirm = await this.getAccountConfirmOrFail(code);
-    if (confirm.account.id !== accountId) {
+    if (confirm.account.id !== account_id) {
       throw new WrongCodeException();
     }
     await this.accountsService.getRepo().save({ ...confirm.account, is_email_confirmed: true });

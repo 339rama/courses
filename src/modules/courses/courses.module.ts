@@ -2,7 +2,6 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Course } from './models/Course.entity';
 import { CourseLevel } from './models/CourseLevel.entity';
-import { CoursePurchase } from './models/CoursePurchase.entity';
 import { CourseReview } from './models/CourseReview.entity';
 import { FavouriteCourse } from './models/FavouriteCourse.entity';
 import { HomeworkAnswerFree } from './models/HomeworkAnswerFree.entity';
@@ -10,10 +9,8 @@ import { HomeworkIsDone } from './models/HomeworkIsDone.entity';
 import { HomeworkQuestion } from './models/HomeworkQuestion.entity';
 import { HomeworkResult } from './models/HomeworkResult.entity';
 import { Lesson } from './models/Lesson.entity';
-import { LessonFile } from './models/LessonFile.entity';
 import { LessonHomework } from './models/LessonHomework.entity';
 import { LessonIsDone } from './models/LessonIsDone.entity';
-import { LessonViewed } from './models/LessonViewed.entity';
 import { TestVariant } from './models/TestVariant.entity';
 import { LessonsService } from './services/lessons.service';
 import { CoursesService } from './services/courses.service';
@@ -32,7 +29,7 @@ import { HomeworkAnswersService } from './services/homework-answers.service';
 import { HomeworkAnswersController } from './controllers/homework-answers.controller';
 import { CourseReviewsController } from './controllers/course-reviews.controller';
 import { CoursePurchasesController } from './controllers/course-purchase.controller';
-import { CoursePurhcasesService } from './services/course-purchase.service';
+import { CoursePurchasesService } from './services/course-purchase.service';
 
 @Module({
   imports: [
@@ -43,7 +40,6 @@ import { CoursePurhcasesService } from './services/course-purchase.service';
       CourseLevel,
       Lesson,
       LessonHomework,
-      LessonFile,
       HomeworkResult,
       HomeworkIsDone,
       LessonIsDone,
@@ -52,8 +48,6 @@ import { CoursePurhcasesService } from './services/course-purchase.service';
       TestVariant,
       FavouriteCourse,
       CourseReview,
-      LessonViewed,
-      CoursePurchase,
       AccountLessonTimeCode,
     ]),
   ],
@@ -74,7 +68,7 @@ import { CoursePurhcasesService } from './services/course-purchase.service';
     AccountsService,
     CoursesReviewsService,
     HomeworkAnswersService,
-    CoursePurhcasesService,
+    CoursePurchasesService,
   ],
   exports: [CoursesService, CourseLevelsService, HomeworksService, LessonsService],
 })

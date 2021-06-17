@@ -1,6 +1,6 @@
 import { MaxLength, MinLength } from 'class-validator';
 import { BaseEntity } from 'src/modules/database/models/BaseEntity';
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
 import { Course } from './Course.entity';
 
 @Entity('course_level')
@@ -14,10 +14,13 @@ export class CourseLevel extends BaseEntity {
   name: string;
 
   //relations
-  @ManyToOne(
+
+  @OneToMany(
     () => Course,
-    course => course.levels,
-    { onDelete: 'CASCADE' },
+    course => course.level,
+    {
+      cascade: true,
+    },
   )
-  course: Course;
+  course?: Course[];
 }
