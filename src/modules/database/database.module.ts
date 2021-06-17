@@ -9,6 +9,8 @@ export const DatabaseModule = TypeOrmModule.forRootAsync({
     username: configService.get<string>('DB_USER'),
     password: configService.get<string>('DB_PASSWORD'),
     database: configService.get<string>('DB_NAME'),
+    // type: 'sqlite',
+    // database: './sqlite/db.sqlite',
     entities: [__dirname + '/../**/*.entity{.ts,.js}'],
     synchronize: false,
     migrationsRun: true,

@@ -5,20 +5,13 @@ import { FavouriteCourse } from 'src/modules/courses/models/FavouriteCourse.enti
 import { HomeworkAnswerFree } from 'src/modules/courses/models/HomeworkAnswerFree.entity';
 import { HomeworkIsDone } from 'src/modules/courses/models/HomeworkIsDone.entity';
 import { HomeworkResult } from 'src/modules/courses/models/HomeworkResult.entity';
-import { LessonComment } from 'src/modules/courses/models/LessonComment.entity';
-import { LessonCommentAnswer } from 'src/modules/courses/models/LessonCommentAnswer.entity';
-import { LessonCommentAnswerReview } from 'src/modules/courses/models/LessonCommentAnswerReview.entity';
-import { LessonCommentReview } from 'src/modules/courses/models/LessonCommentReview.entity';
 import { LessonIsDone } from 'src/modules/courses/models/LessonIsDone.entity';
 import { LessonViewed } from 'src/modules/courses/models/LessonViewed.entity';
 import { BaseEntity } from 'src/modules/database/models/BaseEntity';
-import { Message } from 'src/modules/messages/models/Message.entity';
 import { Purchase } from 'src/modules/payment/models/Purchase.entity';
-import { OneToMany } from 'typeorm';
+import { JoinTable, ManyToMany, OneToMany } from 'typeorm';
 import { AccountConfirmCode } from '../AccountConfirmCode.entity';
 import { AccountLessonTimeCode } from '../AccountLessonTimeCode.entity';
-import { AccountSession } from '../AccountSession.entity';
-import { AccountSubscription } from '../AccountSubscription.entity';
 
 export class AccountRelations extends BaseEntity {
   @OneToMany(
@@ -29,24 +22,6 @@ export class AccountRelations extends BaseEntity {
     },
   )
   confirm_codes?: AccountConfirmCode[];
-
-  @OneToMany(
-    () => AccountSubscription,
-    subscription => subscription.account,
-    {
-      cascade: true,
-    },
-  )
-  subscriptions?: AccountSubscription[];
-
-  @OneToMany(
-    () => AccountSession,
-    session => session.account,
-    {
-      cascade: true,
-    },
-  )
-  sessions?: AccountSubscription[];
 
   @OneToMany(
     () => Course,
@@ -115,44 +90,15 @@ export class AccountRelations extends BaseEntity {
   courses_purchases!: CoursePurchase[];
 
   @OneToMany(
-    () => LessonComment,
-    comment => comment.account,
-  )
-  lessons_comments!: LessonComment[];
-
-  @OneToMany(
-    () => LessonCommentAnswer,
-    comment_answer => comment_answer.account,
-  )
-  lessons_comments_answers!: LessonCommentAnswer[];
-
-  @OneToMany(
-    () => LessonCommentReview,
-    comment_review => comment_review.account,
-  )
-  lessons_comments_reviews!: LessonCommentReview[];
-
-  @OneToMany(
-    () => LessonCommentAnswerReview,
-    answer_review => answer_review.account,
-  )
-  lessons_comments_answers_reviews!: LessonCommentAnswerReview[];
-
-  @OneToMany(
-    () => Message,
-    message => message.author,
-  )
-  sent_messages!: Message[];
-
-  @OneToMany(
-    () => Message,
-    message => message.reciever,
-  )
-  recieved_messages!: Message[];
-
-  @OneToMany(
     () => Purchase,
     purchase => purchase.account,
   )
   purchases!: Purchase[];
+
+  @ManyToMany(
+    () => Course,
+    course => course.buyers,
+  )
+  @JoinTable()
+  bought_courses: Course[];
 }

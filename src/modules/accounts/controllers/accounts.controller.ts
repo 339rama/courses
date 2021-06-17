@@ -26,7 +26,6 @@ import { AccountsService } from '../services/accounts.service';
   },
 })
 @Controller('accounts')
-// @UseGuards(JwtAuthenticationGuard)
 export class AccountsController implements CrudController<Account> {
   constructor(
     public service: AccountsService,

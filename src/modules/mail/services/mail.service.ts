@@ -9,7 +9,6 @@ export class MailService {
     return await this.service.sendMail({
       to,
       subject,
-      from: 'noreply@mail.com',
       text: message,
       // html: '<b>welcome</b>',
     });

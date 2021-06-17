@@ -10,7 +10,6 @@ import {
   OneToMany,
 } from 'typeorm';
 import { Course } from './Course.entity';
-import { LessonComment } from './LessonComment.entity';
 import { LessonFile } from './LessonFile.entity';
 import { LessonHomework } from './LessonHomework.entity';
 import { LessonIsDone } from './LessonIsDone.entity';
@@ -88,10 +87,4 @@ export class Lesson extends BaseEntity {
     view => view.lesson,
   )
   lesson_views!: LessonViewed[];
-
-  @OneToMany(
-    () => LessonComment,
-    comment => comment.lesson,
-  )
-  lessons_comments!: LessonComment[];
 }

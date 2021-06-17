@@ -20,16 +20,19 @@ export class CoursesService extends TypeOrmCrudService<Course> {
     return this.repository;
   }
 
+  public courseRelationsBuilder(account: Account, relation: string) {
+    return this.accountsService
+      .getRepo()
+      .createQueryBuilder()
+      .relation(relation)
+      .of(account);
+  }
+
   public async addToAccountFavourites(
     account: Account,
     courseId: number,
   ): Promise<{ result: boolean }> {
-    await this.accountsService
-      .getRepo()
-      .createQueryBuilder()
-      .relation('favourite_courses')
-      .of(account)
-      .add(courseId);
+    await this.accountsService.accountRelationsBuilder(account, 'favourite-courses').add(courseId);
     return { result: true };
   }
 
@@ -38,28 +41,18 @@ export class CoursesService extends TypeOrmCrudService<Course> {
     courseId: number,
   ): Promise<{ result: boolean }> {
     await this.accountsService
-      .getRepo()
-      .createQueryBuilder()
-      .relation('favourite_courses')
-      .of(account)
+      .accountRelationsBuilder(account, 'favourite-courses')
       .remove(courseId);
     return { result: true };
   }
 
   public async getAccountFavourites(account: Account): Promise<Course[]> {
     return await this.accountsService
-      .getRepo()
-      .createQueryBuilder()
-      .relation('favourite_courses')
-      .of(account)
+      .accountRelationsBuilder(account, 'favourite-courses')
       .loadMany();
   }
+
   public async getAccountCourses(account: Account): Promise<Course[]> {
-    return await this.accountsService
-      .getRepo()
-      .createQueryBuilder()
-      .relation('courses')
-      .of(account)
-      .loadMany();
+    return await this.accountsService.accountRelationsBuilder(account, 'courses').loadMany();
   }
 }

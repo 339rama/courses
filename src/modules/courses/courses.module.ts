@@ -10,10 +10,6 @@ import { HomeworkIsDone } from './models/HomeworkIsDone.entity';
 import { HomeworkQuestion } from './models/HomeworkQuestion.entity';
 import { HomeworkResult } from './models/HomeworkResult.entity';
 import { Lesson } from './models/Lesson.entity';
-import { LessonComment } from './models/LessonComment.entity';
-import { LessonCommentAnswer } from './models/LessonCommentAnswer.entity';
-import { LessonCommentAnswerReview } from './models/LessonCommentAnswerReview.entity';
-import { LessonCommentReview } from './models/LessonCommentReview.entity';
 import { LessonFile } from './models/LessonFile.entity';
 import { LessonHomework } from './models/LessonHomework.entity';
 import { LessonIsDone } from './models/LessonIsDone.entity';
@@ -28,10 +24,21 @@ import { CoursesController } from './controllers/courses.controller';
 import { AccountsService } from '../accounts/services/accounts.service';
 import { HomeworksController } from './controllers/homeworks.controller';
 import { LessonsController } from './controllers/lessons.controller';
+import { AccountLessonTimeCode } from '../accounts/models/AccountLessonTimeCode.entity';
+import { AccountsModule } from '../accounts/accounts.module';
+import { Account } from '../accounts/models/Account/Account.entity';
+import { CoursesReviewsService } from './services/courses-reviews.service';
+import { HomeworkAnswersService } from './services/homework-answers.service';
+import { HomeworkAnswersController } from './controllers/homework-answers.controller';
+import { CourseReviewsController } from './controllers/course-reviews.controller';
+import { CoursePurchasesController } from './controllers/course-purchase.controller';
+import { CoursePurhcasesService } from './services/course-purchase.service';
 
 @Module({
   imports: [
+    AccountsModule,
     TypeOrmModule.forFeature([
+      Account,
       Course,
       CourseLevel,
       Lesson,
@@ -47,19 +54,27 @@ import { LessonsController } from './controllers/lessons.controller';
       CourseReview,
       LessonViewed,
       CoursePurchase,
-      LessonComment,
-      LessonCommentAnswer,
-      LessonCommentReview,
-      LessonCommentAnswerReview,
+      AccountLessonTimeCode,
     ]),
   ],
-  controllers: [CourseLevelsController, CoursesController, HomeworksController, LessonsController],
+  controllers: [
+    CourseLevelsController,
+    CoursesController,
+    HomeworksController,
+    LessonsController,
+    HomeworkAnswersController,
+    CourseReviewsController,
+    CoursePurchasesController,
+  ],
   providers: [
     CoursesService,
     LessonsService,
     CourseLevelsService,
     HomeworksService,
     AccountsService,
+    CoursesReviewsService,
+    HomeworkAnswersService,
+    CoursePurhcasesService,
   ],
   exports: [CoursesService, CourseLevelsService, HomeworksService, LessonsService],
 })

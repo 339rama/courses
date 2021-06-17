@@ -11,22 +11,15 @@ import { ConfigService } from '@nestjs/config';
           host: config.get('SMTP_HOST'),
           port: +config.get('SMTP_PORT'),
           ignoreTLS: true,
-          secure: false,
+          secure: true,
           auth: {
             user: config.get('SMTP_USER'),
             pass: config.get('SMTP_PASSWORD'),
           },
         },
-        // transport: 'smtps://user@domain.com:pass@smtp.domain.com',
         defaults: {
-          from: 'From who',
+          from: config.get('SMTP_USER'),
         },
-        // template: {
-        //   dir: './templates',
-        //   options: {
-        //     strict: true,
-        //   },
-        // },
       }),
       inject: [ConfigService],
     }),

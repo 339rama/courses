@@ -2,7 +2,7 @@ import { MaxLength, MinLength } from 'class-validator';
 import { Account } from 'src/modules/accounts/models/Account/Account.entity';
 import { BaseEntity } from 'src/modules/database/models/BaseEntity';
 import { Purchase } from 'src/modules/payment/models/Purchase.entity';
-import { Entity, Column, PrimaryGeneratedColumn, OneToMany, ManyToOne } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany, ManyToOne, ManyToMany } from 'typeorm';
 import { CourseLevel } from './CourseLevel.entity';
 import { CoursePurchase } from './CoursePurchase.entity';
 import { CourseReview } from './CourseReview.entity';
@@ -84,4 +84,10 @@ export class Course extends BaseEntity {
     purchase => purchase.course,
   )
   purchases!: Purchase[];
+
+  @ManyToMany(
+    () => Account,
+    account => account.bought_courses,
+  )
+  buyers: Account[];
 }
